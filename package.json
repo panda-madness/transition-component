@@ -1,5 +1,5 @@
 {
-  "name": "transition-component",
+  "name": "@panda_madness/transition-component",
   "version": "0.1.0",
   "description": "Vue's Transition element in web component form",
   "main": "dist/index.js",
@@ -24,5 +24,15 @@
   "devDependencies": {
     "@stencil/core": "^1.8.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panda-madness/transition-component.git"
+  },
+  "author": "Margulan Baimbet <thecigaroman@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/panda-madness/transition-component/issues"
+  },
+  "homepage": "https://github.com/panda-madness/transition-component#readme"
 }

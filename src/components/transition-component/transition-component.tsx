@@ -1,11 +1,9 @@
 import { Component, Prop, h, Element, Watch, Host } from '@stencil/core';
 
 @Component({
-  tag: 'my-component',
-  styleUrl: 'my-component.css',
-  shadow: true
+  tag: 'transition-component'
 })
-export class MyComponent {
+export class TransitionComponent {
   @Element() $el: HTMLElement;
 
   @Prop() name: string = 'fade';
