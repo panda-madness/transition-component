@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+    <title>Stencil Component Starter</title>
+
+    <script type="module" src="/build/transition.esm.js"></script>
+    <script nomodule src="/build/transition.js"></script>
+    <style>
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: opacity .5s;
+      }
+
+      .fade-enter-to {
+        opacity: 1;
+      }
+
+      .fade-enter,
+      .fade-leave-to
+
+      /* .fade-leave-active below version 2.1.8 */
+        {
+        opacity: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <my-component show="false" class="hello-world">
+      <div>
+        <h1>Trying to transition this</h1>
+      </div>
+    </my-component>
+
+  </body>
+
+</html>
