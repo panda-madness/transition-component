@@ -18,6 +18,7 @@ Add some transition classes to your page (conventions explained [here](https://v
 Wrap anything you want to animate in/out in a `transition-component` element. Set it's `name` attribute to the name of your transition. Set it's `show` attribute to `true`/`false`. Watch the magic happen.
 
 ## Todo
+- Add `v-show` like functionality (currently the component's display is toggled).
 - Add list transitions support.
 - Add support for simultaneous CSS animations and transitions.
 - Add support for javascript hooks.
