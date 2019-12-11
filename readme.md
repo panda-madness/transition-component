@@ -6,10 +6,18 @@ This project is an attemp to mimic Vue JS's [transitions](https://vuejs.org/v2/g
 
 [Here's](https://codepen.io/panda_madness/pen/eYmZrbz) a demo on Codepen.
 
-# Stencil
+## Differences from Vue's `transition`
+
+Since this is a web component it can't be _renderless_ like Vue's `transition`. As such, instead of managing classes on it's direct child, this component manages classes on itself. Checkout the demo on Codepen if it's unclear.
+
+## Usage
+
+Add some transition classes to your page (conventions explained [here](https://vuejs.org/v2/guide/transitions.html#Transition-Classes)).
+Wrap anything you want to animate in/out in a `transition-component` element. Set it's `name` attribute to the name of your transition. Set it's `show` attribute to `true`/`false`. Watch the magic happen.
+
+## Stencil
 
 This project is built with Stencil. Stencil is a compiler for building fast web apps using Web Components.
-
 
 ## Using this component
 
