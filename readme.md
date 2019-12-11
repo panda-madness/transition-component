@@ -4,6 +4,8 @@
 
 This project is an attemp to mimic Vue JS's [transitions](https://vuejs.org/v2/guide/transitions.html), but implemented in Web Component form. As such this component is usable with any front-end framework (React, Ember, Angular, etc.), or no framework at all if that's your jazz.
 
+[Here's](https://codepen.io/panda_madness/pen/eYmZrbz) a demo on Codepen.
+
 # Stencil
 
 This project is built with Stencil. Stencil is a compiler for building fast web apps using Web Components.
