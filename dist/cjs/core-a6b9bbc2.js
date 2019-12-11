@@ -19,7 +19,7 @@ function _interopNamespace(e) {
   }
 }
 
-const BUILD = {"allRenderFn":true,"cmpDidLoad":false,"cmpShouldUpdate":false,"cmpDidUnload":false,"cmpDidUpdate":false,"cmpDidRender":false,"cmpWillLoad":true,"cmpWillUpdate":false,"cmpWillRender":false,"connectedCallback":false,"disconnectedCallback":false,"element":false,"event":false,"hasRenderFn":true,"lifecycle":true,"asyncLoading":true,"hostListener":false,"hostListenerTargetWindow":false,"hostListenerTargetDocument":false,"hostListenerTargetBody":false,"hostListenerTargetParent":false,"hostListenerTarget":false,"member":true,"method":false,"mode":false,"noVdomRender":false,"observeAttribute":true,"prop":true,"propBoolean":true,"propNumber":false,"propString":true,"propMutable":false,"reflect":false,"scoped":false,"shadowDom":false,"slot":true,"slotRelocation":true,"state":false,"style":false,"svg":false,"updatable":true,"vdomAttribute":false,"vdomXlink":false,"vdomClass":false,"vdomFunctional":false,"vdomKey":false,"vdomListener":false,"vdomRef":false,"vdomRender":true,"vdomStyle":false,"vdomText":false,"watchCallback":true,"taskQueue":true,"lazyLoad":true,"hydrateServerSide":false,"cssVarShim":true,"initializeNextTick":true,"hydrateClientSide":false,"isDebug":false,"isDev":false,"devTools":false,"lifecycleDOMEvents":false,"profile":false,"hotModuleReplacement":false,"constructableCSS":true,"cssAnnotations":true};
+const BUILD = {"allRenderFn":true,"cmpDidLoad":false,"cmpShouldUpdate":false,"cmpDidUnload":false,"cmpDidUpdate":false,"cmpDidRender":false,"cmpWillLoad":true,"cmpWillUpdate":false,"cmpWillRender":false,"connectedCallback":false,"disconnectedCallback":false,"element":false,"event":false,"hasRenderFn":true,"lifecycle":true,"asyncLoading":true,"hostListener":false,"hostListenerTargetWindow":false,"hostListenerTargetDocument":false,"hostListenerTargetBody":false,"hostListenerTargetParent":false,"hostListenerTarget":false,"member":true,"method":false,"mode":false,"noVdomRender":false,"observeAttribute":true,"prop":true,"propBoolean":true,"propNumber":false,"propString":true,"propMutable":false,"reflect":false,"scoped":false,"shadowDom":false,"slot":true,"slotRelocation":true,"state":false,"style":true,"svg":false,"updatable":true,"vdomAttribute":false,"vdomXlink":false,"vdomClass":false,"vdomFunctional":false,"vdomKey":false,"vdomListener":false,"vdomRef":false,"vdomRender":true,"vdomStyle":false,"vdomText":false,"watchCallback":true,"taskQueue":true,"lazyLoad":true,"hydrateServerSide":false,"cssVarShim":true,"initializeNextTick":true,"hydrateClientSide":false,"isDebug":false,"isDev":false,"devTools":false,"lifecycleDOMEvents":false,"profile":false,"hotModuleReplacement":false,"constructableCSS":true,"cssAnnotations":true};
 const NAMESPACE = 'transition';
 
 let queueCongestion = 0;
@@ -41,6 +41,14 @@ const plt = {
     rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 const supportsShadowDom =  false;
+const supportsConstructibleStylesheets =  /*@__PURE__*/ (() => {
+    try {
+        new CSSStyleSheet();
+        return true;
+    }
+    catch (e) { }
+    return false;
+})() ;
 const hostRefs = new WeakMap();
 const getHostRef = (ref) => hostRefs.get(ref);
 const registerInstance = (lazyInstance, hostRef) => hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
@@ -78,6 +86,7 @@ const loadModule = (cmpMeta, hostRef, hmrVersionId) => {
         return importedModule[exportName];
     }, consoleError);
 };
+const styles = new Map();
 const queueDomReads = [];
 const queueDomWrites = [];
 const queueDomWritesLow = [];
@@ -175,7 +184,7 @@ const patchBrowser = async () => {
         plt.$cssShim$ = win.__stencil_cssshim;
     }
     // @ts-ignore
-    const importMeta = (typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('core-09a650db.js', document.baseURI).href));
+    const importMeta = (typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('core-a6b9bbc2.js', document.baseURI).href));
     const regex = new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`);
     const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (regex.test(s.src) ||
         s.getAttribute('data-stencil-namespace') === NAMESPACE));
@@ -254,6 +263,71 @@ const uniqueTime = (key, measureText) => {
         return () => { return; };
     }
 };
+const rootAppliedStyles = new WeakMap();
+const registerStyle = (scopeId, cssText, allowCS) => {
+    let style = styles.get(scopeId);
+    if (supportsConstructibleStylesheets && allowCS) {
+        style = (style || new CSSStyleSheet());
+        style.replace(cssText);
+    }
+    else {
+        style = cssText;
+    }
+    styles.set(scopeId, style);
+};
+const addStyle = (styleContainerNode, cmpMeta, mode, hostElm) => {
+    let scopeId =  getScopeId(cmpMeta.$tagName$);
+    let style = styles.get(scopeId);
+    // if an element is NOT connected then getRootNode() will return the wrong root node
+    // so the fallback is to always use the document for the root node in those cases
+    styleContainerNode = (styleContainerNode.nodeType === 11 /* DocumentFragment */ ? styleContainerNode : doc);
+    if (style) {
+        if (typeof style === 'string') {
+            styleContainerNode = styleContainerNode.head || styleContainerNode;
+            let appliedStyles = rootAppliedStyles.get(styleContainerNode);
+            let styleElm;
+            if (!appliedStyles) {
+                rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
+            }
+            if (!appliedStyles.has(scopeId)) {
+                {
+                    if ( plt.$cssShim$) {
+                        styleElm = plt.$cssShim$.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & 10 /* needsScopedEncapsulation */));
+                        const newScopeId = styleElm['s-sc'];
+                        if (newScopeId) {
+                            scopeId = newScopeId;
+                            // we don't want to add this styleID to the appliedStyles Set
+                            // since the cssVarShim might need to apply several different
+                            // stylesheets for the same component
+                            appliedStyles = null;
+                        }
+                    }
+                    else {
+                        styleElm = doc.createElement('style');
+                        styleElm.innerHTML = style;
+                    }
+                    styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+                }
+                if (appliedStyles) {
+                    appliedStyles.add(scopeId);
+                }
+            }
+        }
+        else if ( !styleContainerNode.adoptedStyleSheets.includes(style)) {
+            styleContainerNode.adoptedStyleSheets = [
+                ...styleContainerNode.adoptedStyleSheets,
+                style
+            ];
+        }
+    }
+    return scopeId;
+};
+const attachStyles = (elm, cmpMeta, mode) => {
+    const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
+    const scopeId = addStyle( elm.getRootNode(), cmpMeta, mode, elm);
+    endAttachStyles();
+};
+const getScopeId = (tagName, mode) => 'sc-' + ( tagName);
 /**
  * Production h() function based on Preact by
  * Jason Miller (@developit)
@@ -749,7 +823,7 @@ const scheduleUpdate = (elm, hostRef, cmpMeta, isInitialLoad) => {
     const endSchedule = createTime('scheduleUpdate', cmpMeta.$tagName$);
     const ancestorComponent = hostRef.$ancestorComponent$;
     const instance =  hostRef.$lazyInstance$ ;
-    const update = () => updateComponent(elm, hostRef, cmpMeta, instance);
+    const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
     attachToAncestor(hostRef, ancestorComponent);
     let promise;
     if (isInitialLoad) {
@@ -768,6 +842,10 @@ const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
     // updateComponent
     const endUpdate = createTime('update', cmpMeta.$tagName$);
     const rc = elm['s-rc'];
+    if ( isInitialLoad) {
+        // DOM WRITE!
+        attachStyles(elm, cmpMeta, hostRef.$modeName$);
+    }
     const endRender = createTime('render', cmpMeta.$tagName$);
     {
         {
@@ -1022,6 +1100,14 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
                 hostRef.$flags$ |= 128 /* isWatchReady */;
             }
             endNewInstance();
+        }
+        const scopeId =  getScopeId(cmpMeta.$tagName$);
+        if ( !styles.has(scopeId) && Cstr.style) {
+            const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
+            // this component has styles but we haven't registered them yet
+            let style = Cstr.style;
+            registerStyle(scopeId, style, !!(cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */));
+            endRegisterStyles();
         }
     }
     // we've successfully created a lazy instance

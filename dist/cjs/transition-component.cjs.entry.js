@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const core = require('./core-09a650db.js');
+const core = require('./core-a6b9bbc2.js');
 
 const TransitionComponent = class {
     constructor(hostRef) {
@@ -10,23 +10,29 @@ const TransitionComponent = class {
         this.name = 'fade';
         this.show = true;
         this.transitionClasses = {
-            enter: 'enter',
-            enterActive: 'enter-active',
-            enterTo: 'enter-to',
-            leave: 'leave',
-            leaveActive: 'leave-active',
-            leaveTo: 'leave-to',
+            enter: null,
+            enterActive: null,
+            enterTo: null,
+            leave: null,
+            leaveActive: null,
+            leaveTo: null,
         };
-        this.enterEndHandler = () => {
+        this.hide = () => {
+            this.$el.style.display = 'none';
+        };
+        this.display = () => {
+            this.$el.style.removeProperty('display');
+        };
+        this.cleanup = () => {
             this.$el.classList.remove(this.transitionClasses.enterTo);
             this.$el.classList.remove(this.transitionClasses.enterActive);
-            this.$el.removeEventListener('transitionend', this.enterEndHandler);
-        };
-        this.leaveEndHandler = () => {
             this.$el.classList.remove(this.transitionClasses.leaveTo);
             this.$el.classList.remove(this.transitionClasses.leaveActive);
-            this.$el.style.display = 'none';
-            this.$el.removeEventListener('transitionend', this.leaveEndHandler);
+            this.$el.removeEventListener('transitionend', this.cleanup);
+            this.$el.removeEventListener('animationend', this.cleanup);
+            if (this.show === false) {
+                this.hide();
+            }
         };
     }
     showHandler(val) {
@@ -56,20 +62,20 @@ const TransitionComponent = class {
         };
     }
     runEnterSequence() {
-        this.$el.style.removeProperty('display');
+        this.display();
         this.$el.classList.add(this.transitionClasses.enter);
         this.$el.classList.add(this.transitionClasses.enterActive);
-        // console.log(getComputedStyle(this.$el).getPropertyValue('animation-name'));
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 this.$el.classList.remove(this.transitionClasses.enter);
                 this.$el.classList.add(this.transitionClasses.enterTo);
             });
         });
-        this.$el.addEventListener('transitionend', this.enterEndHandler);
+        this.$el.addEventListener('transitionend', this.cleanup);
+        this.$el.addEventListener('animationend', this.cleanup);
     }
     runLeaveSequence() {
-        this.$el.style.removeProperty('display');
+        this.display();
         this.$el.classList.add(this.transitionClasses.leave);
         this.$el.classList.add(this.transitionClasses.leaveActive);
         requestAnimationFrame(() => {
@@ -78,7 +84,8 @@ const TransitionComponent = class {
                 this.$el.classList.add(this.transitionClasses.leaveTo);
             });
         });
-        this.$el.addEventListener('transitionend', this.leaveEndHandler);
+        this.$el.addEventListener('transitionend', this.cleanup);
+        this.$el.addEventListener('animationend', this.cleanup);
     }
     render() {
         return (core.h(core.Host, null, core.h("slot", null)));
@@ -88,6 +95,7 @@ const TransitionComponent = class {
         "show": ["showHandler"],
         "name": ["nameHandler"]
     }; }
+    static get style() { return "transition-component{display:block}"; }
 };
 
 exports.transition_component = TransitionComponent;

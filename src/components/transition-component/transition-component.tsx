@@ -1,7 +1,8 @@
 import { Component, Prop, h, Element, Watch, Host } from '@stencil/core';
 
 @Component({
-  tag: 'transition-component'
+  tag: 'transition-component',
+  styleUrl: './transition-component.css',
 })
 export class TransitionComponent {
   @Element() $el: HTMLElement;
@@ -26,13 +27,13 @@ export class TransitionComponent {
   }
 
   private transitionClasses = {
-    enter: 'enter',
-    enterActive: 'enter-active',
-    enterTo: 'enter-to',
-    leave: 'leave',
-    leaveActive: 'leave-active',
-    leaveTo: 'leave-to',
-  }
+    enter: null,
+    enterActive: null,
+    enterTo: null,
+    leave: null,
+    leaveActive: null,
+    leaveTo: null,
+  };
 
   componentWillLoad() {
     if (this.show === false) {
@@ -54,11 +55,9 @@ export class TransitionComponent {
   }
 
   runEnterSequence() {
-    this.$el.style.removeProperty('display');
+    this.display();
     this.$el.classList.add(this.transitionClasses.enter);
     this.$el.classList.add(this.transitionClasses.enterActive);
-
-    // console.log(getComputedStyle(this.$el).getPropertyValue('animation-name'));
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -67,11 +66,12 @@ export class TransitionComponent {
       })
     });
 
-    this.$el.addEventListener('transitionend', this.enterEndHandler)
+    this.$el.addEventListener('transitionend', this.cleanup);
+    this.$el.addEventListener('animationend', this.cleanup);
   }
 
   runLeaveSequence() {
-    this.$el.style.removeProperty('display');
+    this.display();
     this.$el.classList.add(this.transitionClasses.leave);
     this.$el.classList.add(this.transitionClasses.leaveActive);
 
@@ -82,21 +82,30 @@ export class TransitionComponent {
       })
     });
 
-    this.$el.addEventListener('transitionend', this.leaveEndHandler)
+    this.$el.addEventListener('transitionend', this.cleanup);
+    this.$el.addEventListener('animationend', this.cleanup);
   }
 
-  enterEndHandler = () => {
+  hide = () => {
+    this.$el.style.display = 'none';
+  };
+
+  display = () => {
+    this.$el.style.removeProperty('display');
+  };
+
+  cleanup = () => {
     this.$el.classList.remove(this.transitionClasses.enterTo);
     this.$el.classList.remove(this.transitionClasses.enterActive);
-    this.$el.removeEventListener('transitionend', this.enterEndHandler);
-  }
-
-  leaveEndHandler = () => {
     this.$el.classList.remove(this.transitionClasses.leaveTo);
     this.$el.classList.remove(this.transitionClasses.leaveActive);
-    this.$el.style.display = 'none';
-    this.$el.removeEventListener('transitionend', this.leaveEndHandler);
-  }
+    this.$el.removeEventListener('transitionend', this.cleanup);
+    this.$el.removeEventListener('animationend', this.cleanup);
+
+    if (this.show === false) {
+      this.hide();
+    }
+  };
 
   render() {
     return (

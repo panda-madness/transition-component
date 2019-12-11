@@ -9,7 +9,8 @@ export declare class TransitionComponent {
     updateTransitionClasses(name: string): void;
     runEnterSequence(): void;
     runLeaveSequence(): void;
-    enterEndHandler: () => void;
-    leaveEndHandler: () => void;
+    hide: () => void;
+    display: () => void;
+    cleanup: () => void;
     render(): any;
 }

@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const core = require('./core-09a650db.js');
+const core = require('./core-a6b9bbc2.js');
 
 const defineCustomElements = (win, options) => {
   return core.patchEsm().then(() => {
